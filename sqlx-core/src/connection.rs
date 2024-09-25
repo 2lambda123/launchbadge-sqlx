@@ -149,9 +149,9 @@ pub trait Connection: Send {
 
 
     /// Establish a new database connection with the provided options.
-    fn connect_with<'a>(options: &'a Self::Options) -> BoxFuture<'_, Result<Self, Error>>
+    fn connect_with(options: &Self::Options) -> BoxFuture<'_, Result<Self, Error>>
     where
-        Self: Sized + 'a,
+        Self: Sized
     {
         Box::pin(options.connect())
     }
