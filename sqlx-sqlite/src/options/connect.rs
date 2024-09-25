@@ -28,26 +28,24 @@ impl ConnectOptions for SqliteConnectOptions {
         self.build_url()
     }
 
-    fn connect(&self) -> BoxFuture<'_, Result<Self::Connection, Error>>
+    async fn connect(&self) -> Result<Self::Connection, Error>
     where
         Self::Connection: Sized,
     {
-        Box::pin(async move {
-            let mut conn = SqliteConnection::establish(self).await?;
+        let mut conn = SqliteConnection::establish(self).await?;
 
-            // Execute PRAGMAs
-            conn.execute(&*self.pragma_string()).await?;
+        // Execute PRAGMAs
+        conn.execute(&*self.pragma_string()).await?;
 
-            if !self.collations.is_empty() {
-                let mut locked = conn.lock_handle().await?;
+        if !self.collations.is_empty() {
+            let mut locked = conn.lock_handle().await?;
 
-                for collation in &self.collations {
-                    collation.create(&mut locked.guard.handle)?;
-                }
+            for collation in &self.collations {
+                collation.create(&mut locked.guard.handle)?;
             }
+        }
 
-            Ok(conn)
-        })
+        Ok(conn)
     }
 
     fn log_statements(mut self, level: LevelFilter) -> Self {
