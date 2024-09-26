@@ -1,6 +1,6 @@
 use crate::database::{Database, HasStatementCache};
-use std::future::Future;
 use crate::error::Error;
+use std::future::Future;
 
 use crate::transaction::Transaction;
 use futures_core::future::BoxFuture;
@@ -46,7 +46,9 @@ pub trait Connection: Send {
     /// Begin a new transaction or establish a savepoint within the active transaction.
     ///
     /// Returns a [`Transaction`] for controlling and tracking the new transaction.
-    fn begin(&mut self) -> impl Future<Output = Result<Transaction<'_, Self::Database>, Error>> + Send + '_
+    fn begin(
+        &mut self,
+    ) -> impl Future<Output = Result<Transaction<'_, Self::Database>, Error>> + Send + '_
     where
         Self: Sized;
 
@@ -67,7 +69,10 @@ pub trait Connection: Send {
     /// })).await
     /// # }
     /// ```
-    fn transaction<'a, F, R, E>(&'a mut self, callback: F) -> impl Future<Output = Result<R, E>> + Send + 'a
+    fn transaction<'a, F, R, E>(
+        &'a mut self,
+        callback: F,
+    ) -> impl Future<Output = Result<R, E>> + Send + 'a
     where
         for<'c> F: FnOnce(&'c mut Transaction<'_, Self::Database>) -> BoxFuture<'c, Result<R, E>>
             + 'a
@@ -137,7 +142,7 @@ pub trait Connection: Send {
     ///
     /// A value of [`Options`][Self::Options] is parsed from the provided connection string. This parsing
     /// is database-specific.
-     #[inline]
+    #[inline]
     fn connect(url: &str) -> impl Future<Output = Result<Self, Error>> + Send + 'static
     where
         Self: Sized,
@@ -147,11 +152,12 @@ pub trait Connection: Send {
         async move { Self::connect_with(&options?).await }
     }
 
-
     /// Establish a new database connection with the provided options.
-    fn connect_with(options: &Self::Options) -> impl Future<Output = Result<Self, Error>> + Send + '_
+    fn connect_with(
+        options: &Self::Options,
+    ) -> impl Future<Output = Result<Self, Error>> + Send + '_
     where
-        Self: Sized
+        Self: Sized,
     {
         options.connect()
     }

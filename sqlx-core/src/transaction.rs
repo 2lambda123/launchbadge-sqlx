@@ -1,6 +1,6 @@
 use std::borrow::Cow;
-use std::future::Future;
 use std::fmt::{self, Debug, Formatter};
+use std::future::Future;
 use std::ops::{Deref, DerefMut};
 
 use futures_core::future::BoxFuture;
@@ -30,7 +30,6 @@ pub trait TransactionManager {
     fn rollback(
         conn: &mut <Self::Database as Database>::Connection,
     ) -> impl Future<Output = Result<(), Error>> + Send;
-
 
     /// Starts to abort the active transaction or restore from the most recent snapshot.
     fn start_rollback(conn: &mut <Self::Database as Database>::Connection);
@@ -233,7 +232,7 @@ impl<'c, 't, DB: Database> crate::acquire::Acquire<'t> for &'t mut Transaction<'
     type Connection = &'t mut <DB as Database>::Connection;
 
     #[inline]
-fn acquire(self) -> BoxFuture<'t, Result<Self::Connection, Error>> {
+    fn acquire(self) -> BoxFuture<'t, Result<Self::Connection, Error>> {
         Box::pin(futures_util::future::ok(&mut **self))
     }
 

@@ -24,7 +24,9 @@ pub trait TestSupport: Database {
     ///
     /// The implementation may require `DATABASE_URL` to be set in order to manage databases.
     /// The user credentials it contains must have the privilege to create and drop databases.
-    fn test_context(args: &TestArgs) -> impl Future<Output =  Result<TestContext<Self>, Error>> + Send + '_;
+    fn test_context(
+        args: &TestArgs,
+    ) -> impl Future<Output = Result<TestContext<Self>, Error>> + Send + '_;
 
     fn cleanup_test(db_name: &str) -> impl Future<Output = Result<(), Error>> + Send + '_;
 

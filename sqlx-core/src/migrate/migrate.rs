@@ -1,8 +1,8 @@
 use crate::error::Error;
 use crate::migrate::{AppliedMigration, MigrateError, Migration};
 use futures_core::future::BoxFuture;
-use std::time::Duration;
 use std::future::Future;
+use std::time::Duration;
 
 pub trait MigrateDatabase {
     // create database in url
