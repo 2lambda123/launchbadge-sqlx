@@ -8,7 +8,6 @@ use std::ptr;
 use std::ptr::NonNull;
 
 use futures_intrusive::sync::MutexGuard;
-use futures_util::future;
 use libsqlite3_sys::{
     sqlite3, sqlite3_commit_hook, sqlite3_progress_handler, sqlite3_rollback_hook,
     sqlite3_update_hook, SQLITE_DELETE, SQLITE_INSERT, SQLITE_UPDATE,

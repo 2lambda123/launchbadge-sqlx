@@ -1,6 +1,5 @@
 use std::fmt::{self, Debug, Formatter};
 
-use futures_util::FutureExt;
 pub(crate) use sqlx_core::connection::*;
 pub(crate) use stream::{MySqlStream, Waiting};
 

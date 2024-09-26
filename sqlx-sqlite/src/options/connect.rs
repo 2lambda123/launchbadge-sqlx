@@ -1,5 +1,4 @@
 use crate::{SqliteConnectOptions, SqliteConnection};
-use futures_core::future::BoxFuture;
 use log::LevelFilter;
 use sqlx_core::connection::ConnectOptions;
 use sqlx_core::error::Error;
