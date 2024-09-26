@@ -233,7 +233,7 @@ impl<'c, 't, DB: Database> crate::acquire::Acquire<'t> for &'t mut Transaction<'
     type Connection = &'t mut <DB as Database>::Connection;
 
     #[inline]
-    fn acquire(self) -> BoxFuture<'t, Result<Self::Connection, Error>> {
+fn acquire(self) -> BoxFuture<'t, Result<Self::Connection, Error>> {
         Box::pin(futures_util::future::ok(&mut **self))
     }
 

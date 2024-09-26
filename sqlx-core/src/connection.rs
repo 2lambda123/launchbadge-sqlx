@@ -77,7 +77,7 @@ pub trait Connection: Send {
         R: Send,
         E: From<Error> + Send,
     {
-        Box::pin(async move {
+        async move {
             let mut transaction = self.begin().await?;
             let ret = callback(&mut transaction).await;
 
@@ -93,7 +93,7 @@ pub trait Connection: Send {
                     Err(err)
                 }
             }
-        })
+        }
     }
 
     /// The number of statements currently cached in the connection.
@@ -138,22 +138,22 @@ pub trait Connection: Send {
     /// A value of [`Options`][Self::Options] is parsed from the provided connection string. This parsing
     /// is database-specific.
      #[inline]
-    fn connect(url: &str) -> BoxFuture<'static, Result<Self, Error>>
+    fn connect(url: &str) -> impl Future<Output = Result<Self, Error>> + Send + 'static
     where
         Self: Sized,
     {
         let options = url.parse();
 
-        Box::pin(async move { Self::connect_with(&options?).await })
+        async move { Self::connect_with(&options?).await }
     }
 
 
     /// Establish a new database connection with the provided options.
-    fn connect_with(options: &Self::Options) -> BoxFuture<'_, Result<Self, Error>>
+    fn connect_with(options: &Self::Options) -> impl Future<Output = Result<Self, Error>> + Send + '_
     where
         Self: Sized
     {
-        Box::pin(options.connect())
+        options.connect()
     }
 }
 
