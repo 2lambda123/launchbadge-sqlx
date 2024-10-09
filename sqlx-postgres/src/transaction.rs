@@ -35,8 +35,10 @@ impl TransactionManager for PgTransactionManager {
 
     async fn rollback(conn: &mut PgConnection) -> Result<(), Error> {
         if conn.inner.transaction_depth > 0 {
-            conn.execute(&*rollback_ansi_transaction_sql(conn.inner.transaction_depth))
-                .await?;
+            conn.execute(&*rollback_ansi_transaction_sql(
+                conn.inner.transaction_depth,
+            ))
+            .await?;
 
             conn.inner.transaction_depth -= 1;
         }
