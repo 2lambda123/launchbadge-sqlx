@@ -8,6 +8,7 @@ use std::sync::Arc;
 
 use sqlx::postgres::types::{Oid, PgCiText, PgInterval, PgMoney, PgRange};
 use sqlx::postgres::Postgres;
+use sqlx_macros::FromRow;
 use sqlx_test::{new, test_decode_type, test_prepared_type, test_type};
 
 use sqlx_core::executor::Executor;
@@ -699,5 +700,22 @@ async fn test_arc() -> anyhow::Result<()> {
     assert!(user_age.1.as_ref() == &2);
     assert!(user_age.2.as_ref() == &3);
     assert!(user_age.3 == 4);
+    Ok(())
+}
+
+#[sqlx_macros::test]
+async fn test_arc_slice_2() -> anyhow::Result<()> {
+    let mut conn = new::<Postgres>().await?;
+
+    #[derive(FromRow)]
+    struct Nested {
+        inner: Arc<[i32]>,
+    }
+
+    let username: Nested = sqlx::query_as("SELECT ARRAY[1, 2, 3]::INT4[] as inner")
+        .fetch_one(&mut conn)
+        .await?;
+
+    assert!(username.inner.as_ref() == &[1, 2, 3]);
     Ok(())
 }
