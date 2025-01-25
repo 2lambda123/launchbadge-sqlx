@@ -24,6 +24,10 @@ pub enum JoinHandle<T> {
 }
 
 pub async fn timeout<F: Future>(duration: Duration, f: F) -> Result<F::Output, TimeoutError> {
+    // Box futures in debug mode to decrease stack size
+    #[cfg(debug_assertions)]
+    let f = Box::pin(f);
+
     #[cfg(feature = "_rt-tokio")]
     if rt_tokio::available() {
         return tokio::time::timeout(duration, f)
