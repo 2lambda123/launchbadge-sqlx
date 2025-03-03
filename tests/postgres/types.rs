@@ -704,18 +704,19 @@ async fn test_arc() -> anyhow::Result<()> {
 }
 
 #[sqlx_macros::test]
-async fn test_arc_slice_2() -> anyhow::Result<()> {
+async fn test_arc_str_slice() -> anyhow::Result<()> {
     let mut conn = new::<Postgres>().await?;
 
-    #[derive(FromRow)]
-    struct Nested {
-        inner: Arc<[i32]>,
-    }
+    let name: Arc<str> = "Harold".into();
+    let slice: Arc<[u8]> = [5, 0].into();
 
-    let username: Nested = sqlx::query_as("SELECT ARRAY[1, 2, 3]::INT4[] as inner")
+    let username: (Arc<str>, Arc<[u8]>) = sqlx::query_as("SELECT $1, $2")
+        .bind(&name)
+        .bind(&slice)
         .fetch_one(&mut conn)
         .await?;
 
-    assert!(username.inner.as_ref() == &[1, 2, 3]);
+    assert!(username.0 == name);
+    assert!(username.1 == slice);
     Ok(())
 }

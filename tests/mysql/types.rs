@@ -387,31 +387,19 @@ CREATE TEMPORARY TABLE user_login (
 }
 
 #[sqlx_macros::test]
-async fn test_arc_str() -> anyhow::Result<()> {
+async fn test_arc_str_slice() -> anyhow::Result<()> {
     let mut conn = new::<MySql>().await?;
 
     let name: Arc<str> = "Harold".into();
+    let slice: Arc<[u8]> = [5, 0].into();
 
-    let username: Arc<str> = sqlx::query_scalar("SELECT ? AS username")
+    let username: (Arc<str>, Arc<[u8]>) = sqlx::query_as("SELECT ?, ?")
         .bind(&name)
+        .bind(&slice)
         .fetch_one(&mut conn)
         .await?;
 
-    assert!(username == name);
-    Ok(())
-}
-
-#[sqlx_macros::test]
-async fn test_arc_slice() -> anyhow::Result<()> {
-    let mut conn = new::<MySql>().await?;
-
-    let name: Arc<[u8]> = [5, 0].into();
-
-    let username: Arc<[u8]> = sqlx::query_scalar("SELECT ?")
-        .bind(&name)
-        .fetch_one(&mut conn)
-        .await?;
-
-    assert!(username == name);
+    assert!(username.0 == name);
+    assert!(username.1 == slice);
     Ok(())
 }
